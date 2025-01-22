@@ -1,9 +1,9 @@
 # S76_weirdEats
 
-Welcome to the *S76_WieredEats*, this is a hands-on project where I will build a website where people can share the experience on weird food combinations and also like (or) commenting others preferences using the MERN stack(MongoDB,Express.js,React.js, and Node.js). The goal is to learn how to develop a full-stack web application step by step.
+Welcome to the *S76_WeirdEats*, this is a hands-on project where I will build a website where people can share the experience on weird food combinations and also like (or) commenting others preferences using the MERN stack(MongoDB,Express.js,React.js, and Node.js). The goal is to learn how to develop a full-stack web application step by step.
 
 ## Milestone 1: Project Overview 
-WeirdEats is a web application where users can share, explore, and rate bizarre food combinations. From pine apple on pizza to chocolate-dipped pickles, the app serves as a hub for food enthusiasts to celebrate the unexpected, strange, and oddly delicious. Users can log in, create their own lists of weird food combos, and view lists from others. The project aims to bring humor and curiosity into the world of food exploration.
+WeirdEats is a web application where users can share, explore, and rate bizarre food combinations. From pineapple on pizza to chocolate-dipped pickles, the app serves as a hub for food enthusiasts to celebrate the unexpected, strange, and oddly delicious. Users can log in, create their own lists of weird food combos, and view lists from others. The project aims to bring humor and curiosity into the world of food exploration.
 
 #### 1.Understanding the MERN Stack:
 *MongoDB :* A Database for storing application data in a flexible , document based format.
