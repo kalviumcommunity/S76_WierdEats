@@ -26,4 +26,5 @@ A well-structured database schema is essential for organizing data effectively. 
 ### 4. Authentication
 Authentication plays a crucial role in securing the application and controlling access. Key features include:
 - **User Verification:** Ensures users are authenticated before accessing specific features, such as sharing or liking food combinations.
+
 - **Security Measures:** Protects sensitive user information and validates user identities to maintain the integrity of the platform.
