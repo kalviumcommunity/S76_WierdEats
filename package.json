@@ -1,0 +1,15 @@
+{
+  "name": "s76_wierdeats",
+  "version": "1.0.0",
+  "description": "WeirdEats is a web application where users can share, explore, and rate bizarre food combinations.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Vignesh",
+  "license": "ISC",
+  "keywords": [],
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
