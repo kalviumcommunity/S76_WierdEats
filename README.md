@@ -1,32 +1,45 @@
 # S76_WeirdEats
 
-Welcome to *S76_WeirdEats*! This is a hands-on project where I will build a website where people can share their experiences with weird food combinations and also like or comment on others' preferences using the MERN stack (MongoDB, Express.js, React.js, and Node.js). The goal is to learn how to develop a full-stack web application step by step.
+## Project Overview
+S76_WeirdEats is a web application designed to let users share, explore, and rate bizarre food combinations. Whether it's pineapple on pizza or chocolate-dipped pickles, this app serves as a hub for food enthusiasts to celebrate the unexpected, strange, and oddly delicious. Users can log in, create their own lists of weird food combos, and interact with others by liking or commenting on their preferences. The project brings humor and curiosity into the world of food exploration.
 
-## Milestone 1: Project Overview
+## Features
+- **User Authentication**: Secure login and registration system to allow users to participate.
+- **Food Combination Sharing**: Users can submit their weird food combinations for others to explore.
+- **Like & Comment System**: Engage with other users' posts by liking or commenting.
+- **User Profiles**: Each user has a profile showcasing their shared food combos and interactions.
+- **Explore & Discover**: Browse through a variety of bizarre food combinations shared by the community.
 
-WeirdEats is a web application where users can share, explore, and rate bizarre food combinations. From pineapple on pizza to chocolate-dipped pickles, the app serves as a hub for food enthusiasts to celebrate the unexpected, strange, and oddly delicious. Users can log in, create their own lists of weird food combos, and view lists from others. The project aims to bring humor and curiosity into the world of food exploration.
+## Tech Stack
+S76_WeirdEats is built using the MERN stack:
 
-### 1. Understanding the MERN Stack
-- **MongoDB:** A NoSQL database for storing application data in a flexible, document-oriented format.
-- **Express.js:** A lightweight backend framework for building APIs and managing server-side logic.
-- **React.js:** A JavaScript library for creating dynamic and interactive user interfaces.
-- **Node.js:** A runtime environment that enables JavaScript to run on the server, powering the backend of the application.
+- **MongoDB**: A NoSQL database for storing user data, food combinations, likes, and comments.
+- **Express.js**: A lightweight backend framework for building APIs and managing server-side logic.
+- **React.js**: A JavaScript library for creating dynamic and interactive user interfaces.
+- **Node.js**: A runtime environment that enables JavaScript to run on the server, powering the backend of the application.
 
-### 2. REST API Structure
-REST APIs enable seamless communication between the frontend and backend. The following APIs will be implemented:
-- **User Authentication:** Provides functionality for user registration and login.
-- **Like Management:** Allows users to like or unlike specific food combinations.
-- **Comment Handling:** Facilitates adding, viewing, and managing user comments on food combinations.
+## REST API Structure
+To enable seamless communication between the frontend and backend, the following REST APIs are implemented:
 
-### 3. Database Schema Design
-A well-structured database schema is essential for organizing data effectively. Using MongoDB, we will:
-- Define schemas that represent the relationships and attributes of various data models.
-- Ensure scalability and flexibility in how data is stored and retrieved.
+1. **User Authentication**: Handles user registration, login, and authentication.
+2. **Food Combination Management**: Allows users to add, edit, and delete food combination entries.
+3. **Like System**: Enables users to like or unlike specific food combinations.
+4. **Comment Handling**: Facilitates adding, viewing, and managing comments on food combinations.
 
-### 4. Authentication
-Authentication plays a crucial role in securing the application and controlling access. Key features include:
-- **User Verification:** Ensures users are authenticated before accessing specific features, such as sharing or liking food combinations.
+## Database Schema Design
+Using MongoDB, we define schemas that represent the relationships and attributes of various data models:
+- **Users**: Stores user information, authentication credentials, and profile details.
+- **Food Combinations**: Stores details of shared food combinations, including user IDs, descriptions, and images.
+- **Likes**: Keeps track of likes associated with each food combination.
+- **Comments**: Stores user-generated comments for each food entry.
 
-- **Security Measures:** Protects sensitive user information and validates user identities to maintain the integrity of the platform.
+## Authentication & Security
+Authentication is implemented to secure the platform and ensure that users have appropriate access. Key security measures include:
+- **User Verification**: Ensures users are authenticated before accessing restricted features.
+- **Data Protection**: Uses encryption and secure practices to protect sensitive user data.
+- **Session Management**: Implements secure authentication mechanisms to maintain user sessions safely.
+
+S76_WeirdEats is an exciting and fun project aimed at building a full-stack application while exploring unconventional food preferences. Join the journey and contribute your weird food combos!
+
 
 ## https://s76-wierdeats.onrender.com
