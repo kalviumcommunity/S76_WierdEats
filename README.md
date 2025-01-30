@@ -41,5 +41,6 @@ Authentication is implemented to secure the platform and ensure that users have 
 
 S76_WeirdEats is an exciting and fun project aimed at building a full-stack application while exploring unconventional food preferences. Join the journey and contribute your weird food combos!
 
+--- 
 
 ## https://s76-wierdeats.onrender.com
