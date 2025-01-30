@@ -28,3 +28,5 @@ Authentication plays a crucial role in securing the application and controlling 
 - **User Verification:** Ensures users are authenticated before accessing specific features, such as sharing or liking food combinations.
 
 - **Security Measures:** Protects sensitive user information and validates user identities to maintain the integrity of the platform.
+
+## https://s76-wierdeats.onrender.com
