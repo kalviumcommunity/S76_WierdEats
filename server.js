@@ -9,8 +9,24 @@ dotenv.config();
 
 connectDatabase();
 app.get('/', (req, res) => {
-    const dbStatus = mongoose.connection.readyState === 1? "Database Connected Successfully" : "Database Connection Failed";
-    res.json({ status: dbStatus});
+    let dbStatus;
+    switch (mongoose.connection.readyState) {
+        case 0:
+            dbStatus = 'Disconnected';
+            break;
+        case 1:
+            dbStatus = 'Connected';
+            break;
+        case 2:
+            dbStatus = 'Connecting';
+            break;
+        case 3:
+            dbStatus = 'Disconnecting';
+            break;
+        default:
+            dbStatus = 'Unknown State';
+    }
+    res.json({ status: dbStatus });
 });
 
 
