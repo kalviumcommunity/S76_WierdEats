@@ -1,0 +1,15 @@
+meta {
+  name: POST1
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:5000/api/users
+  body: {
+    "name": "xyz",
+    "email": "xyz@example.com",
+    "password": "12345678"
+  }
+  auth: none
+}
