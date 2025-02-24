@@ -1,0 +1,19 @@
+meta {
+  name: POST1
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:5000/api/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name":"Vignesh",
+    "email":"techy@gmail.com",
+    "password":"12345678"
+  }
+}

@@ -1,0 +1,19 @@
+meta {
+  name: PUT
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:5000/api/users/67a81f0d4c17fb9ab20e17a7
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "name":"Vicky",
+    "email":"vignesh@gmail.com",
+    "password":"123456789"
+  }
+}
