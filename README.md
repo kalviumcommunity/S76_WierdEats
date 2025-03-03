@@ -44,3 +44,6 @@ S76_WeirdEats is an exciting and fun project aimed at building a full-stack appl
 --- 
 
 ## https://s76-wierdeats.onrender.com
+
+## frontend delployment link:
+- https://weirdeats.pages.dev/
