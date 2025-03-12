@@ -1,8 +1,16 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
-const User = require('./schema');
+const User = require('./schema'); // Ensure you have the User schema imported
 
-// Create a new user (POST)
+
+const foodSchema = new mongoose.Schema({
+    food_combinations: Array,
+});
+
+const Food = mongoose.model("food_combinations", foodSchema);
+
+
 router.post('/users', async (req, res) => {
     try {
         const { name, email, password } = req.body;
@@ -45,5 +53,23 @@ router.delete('/users/:id', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
+// ✅ **Food Routes**
+
+// Get all food combinations (GET)
+router.get("/foods", async (req, res) => {
+    try {
+        const foodData = await Food.find(); // Returns an array
+        if (foodData.length > 0) {
+            const allFoodCombinations = foodData.flatMap(item => item.food_combinations);
+            res.json(allFoodCombinations);
+        } else {
+            res.status(404).json({ message: "No food combinations found" });
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching food combinations" });
+    }
+});
+
 
 module.exports = router;

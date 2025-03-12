@@ -1,5 +1,6 @@
 import React from 'react'
 import {useState,useEffect} from 'react'
+import { useNavigate } from 'react-router-dom'
 import banner from '../assets/images/banner.jpeg'
 import model from '../assets/images/models.png'
 import FeatureComponent from '../components/FeatureComponent'
@@ -12,10 +13,15 @@ import NavBar from '../components/NavBar'
 
 
 const LandingPage = () => {
+  const navigate = useNavigate()
   const [currentIndex, setcurrentIndex] = useState(0);
   const [text,setText] = useState("");
   const fullName = Profile.name
   const [isVisible, setIsVisible] = useState(false);
+
+  const handleClick = () => {
+    navigate('/foods')
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -110,7 +116,8 @@ const LandingPage = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.2, delay: 0 }}
               whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }} 
+              whileTap={{ scale: 0.9 }}
+              onClick={handleClick} 
               className="h-[50px] w-[250px] bg-[#6948DF] mt-[30px] text-white rounded-[15px] font-bold hover:scale-110 transition duration-300">
                 Explore Food Combinations
               </motion.button>
