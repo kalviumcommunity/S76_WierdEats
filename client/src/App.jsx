@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import NavBar from './components/NavBar'
 import Component from './components/Component'
 import FoodCards from './components/FoodCards'
+import FoodForm from './components/FoodForm'
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path='/navbar' element={<NavBar/>}/>
         <Route path='/entity' element={<Component/>}/>
         <Route path = '/foods' element={<FoodCards/>}/>
+        <Route path = '/add-food' element={<FoodForm/>}/>
 
       </Routes>
     </BrowserRouter>

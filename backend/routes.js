@@ -1,15 +1,21 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
-const User = require('./schema'); // Ensure you have the User schema imported
+const User = require('./schema'); // Import User schema
 
-
+// Define food schema
 const foodSchema = new mongoose.Schema({
-    food_combinations: Array,
+    id: { type: Number, required: true, unique: true },
+    name: { type: String, required: true },
+    ingredients: { type: [String], required: true },
+    cuisine: { type: String, required: true },
+    meal_type: { type: String, required: true }
 });
 
+// Define model
 const Food = mongoose.model("food_combinations", foodSchema);
 
+// ---------------- USER ROUTES ----------------
 
 router.post('/users', async (req, res) => {
     try {
@@ -22,7 +28,6 @@ router.post('/users', async (req, res) => {
     }
 });
 
-// Get all users (GET)
 router.get('/users', async (req, res) => {
     try {
         const users = await User.find();
@@ -32,7 +37,6 @@ router.get('/users', async (req, res) => {
     }
 });
 
-// Update a user by ID (PUT)
 router.put('/users/:id', async (req, res) => {
     try {
         const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -43,7 +47,6 @@ router.put('/users/:id', async (req, res) => {
     }
 });
 
-// Delete a user by ID (DELETE)
 router.delete('/users/:id', async (req, res) => {
     try {
         const deletedUser = await User.findByIdAndDelete(req.params.id);
@@ -54,22 +57,36 @@ router.delete('/users/:id', async (req, res) => {
     }
 });
 
-// ✅ **Food Routes**
+// ---------------- FOOD ROUTES ----------------
 
-// Get all food combinations (GET)
+// ✅ **Fetch all food combinations (New & Old)**
 router.get("/foods", async (req, res) => {
     try {
-        const foodData = await Food.find(); // Returns an array
-        if (foodData.length > 0) {
-            const allFoodCombinations = foodData.flatMap(item => item.food_combinations);
-            res.json(allFoodCombinations);
-        } else {
-            res.status(404).json({ message: "No food combinations found" });
-        }
+        const allFoods = await Food.find(); // Get all food items
+        res.status(200).json(allFoods); // Return all items
     } catch (error) {
         res.status(500).json({ message: "Error fetching food combinations" });
     }
 });
 
+// ✅ **Add new food combination without overwriting existing ones**
+router.post("/foods", async (req, res) => {
+    try {
+        const { id, name, ingredients, cuisine, meal_type } = req.body;
+
+        // Check if food with the same ID exists
+        const existingFood = await Food.findOne({ id });
+        if (existingFood) {
+            return res.status(400).json({ message: "Food ID already exists" });
+        }
+
+        const newFood = new Food({ id, name, ingredients, cuisine, meal_type });
+        await newFood.save();
+
+        res.status(201).json(newFood);
+    } catch (error) {
+        res.status(500).json({ message: "Error adding food combination" });
+    }
+});
 
 module.exports = router;
