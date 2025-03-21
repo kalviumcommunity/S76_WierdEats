@@ -89,4 +89,39 @@ router.post("/foods", async (req, res) => {
     }
 });
 
+// ✅ **Update an existing food combination**
+router.put("/foods/:id", async (req, res) => {
+    try {
+        const updatedFood = await Food.findOneAndUpdate({ id: req.params.id }, req.body, { new: true });
+        if (!updatedFood) {
+            return res.status(404).json({ message: "Food item not found" });
+        }
+        res.status(200).json(updatedFood);
+    } catch (error) {
+        res.status(500).json({ message: "Error updating food combination" });
+    }
+});
+
+// ✅ **Delete a food combination**
+router.delete("/foods/:id", async (req, res) => {
+    try {
+        const deletedFood = await Food.findOneAndDelete({ id: req.params.id });
+        if (!deletedFood) {
+            return res.status(404).json({ message: "Food item not found" });
+        }
+        res.status(200).json({ message: "Food item deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Error deleting food combination" });
+    }
+});
+
+router.get("/foods/:id", async (req, res) => {
+    try {
+        const food = await Food.findById(req.params.id);
+        if (!food) return res.status(404).json({ message: "Food not found" });
+        res.status(200).json(food);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching food item" });
+    }
+});
 module.exports = router;
