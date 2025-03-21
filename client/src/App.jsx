@@ -18,6 +18,7 @@ function App() {
         <Route path='/entity' element={<Component/>}/>
         <Route path = '/foods' element={<FoodCards/>}/>
         <Route path = '/add-food' element={<FoodForm/>}/>
+        <Route path = '/edit-food/:id' element={<FoodForm/>}/>
 
       </Routes>
     </BrowserRouter>
