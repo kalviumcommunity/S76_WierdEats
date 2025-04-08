@@ -20,7 +20,7 @@ const FoodCards = () => {
     try {
       const response = await axios.get("http://localhost:5000/api/foods");
       setFoods(response.data);
-      setAllFoods(response.data); // Save for filtering
+      setAllFoods(response.data);
     } catch (err) {
       setError("Error fetching food data");
     } finally {
@@ -30,7 +30,7 @@ const FoodCards = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/user");
+      const response = await axios.get("http://localhost:5000/api/users");
       setUsers(response.data);
     } catch (err) {
       console.error("Error fetching users", err);
@@ -54,7 +54,7 @@ const FoodCards = () => {
     if (email === "") {
       setFoods(allFoods);
     } else {
-      const filtered = allFoods.filter((food) => food.email === email);
+      const filtered = allFoods.filter((food) => food.created_by?.email === email);
       setFoods(filtered);
     }
   };
@@ -80,8 +80,17 @@ const FoodCards = () => {
           </select>
 
           <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition"
-            onClick={() => navigate("/add-food")}
+            disabled={!selectedEmail}
+            className={`px-4 py-2 rounded-lg shadow transition text-white ${
+              selectedEmail ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 cursor-not-allowed"
+            }`}
+            onClick={() => {
+              const selectedUser = users.find((user) => user.email === selectedEmail);
+              if (selectedUser) {
+                localStorage.setItem("userId", selectedUser._id);
+                navigate("/add-food");
+              }
+            }}
           >
             Add New
           </button>
@@ -102,7 +111,9 @@ const FoodCards = () => {
               <p className="text-gray-600"><strong>Cuisine:</strong> {food.cuisine}</p>
               <p className="text-gray-600"><strong>Meal Type:</strong> {food.meal_type}</p>
               <p className="text-gray-800"><strong>Ingredients:</strong> {food.ingredients.join(", ")}</p>
-              <p className="text-sm text-gray-500 mt-1"><strong>Added by:</strong> {food.email}</p>
+              <p className="text-sm text-gray-500 mt-1">
+                <strong>Added by:</strong> {food.created_by?.email || "Unknown"}
+              </p>
 
               <div className="mt-2 flex gap-2">
                 <button
