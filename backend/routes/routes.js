@@ -2,8 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { body, param, validationResult } = require('express-validator');
 const router = express.Router();
-const User = require('./models/user');
-const Food = require('./models/food'); // Your User model
+const User = require('../models/user');
+const Food = require('../models/food'); // Your User model
 
 // 🔁 Updated Food schema with reference to User
 // const foodSchema = new mongoose.Schema({
