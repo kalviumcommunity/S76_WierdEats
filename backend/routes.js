@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { body, param, validationResult } = require('express-validator'); 
 const router = express.Router();
-const User = require('./schema'); // Import User schema
+const User = require('./schema'); 
 
 
 const foodSchema = new mongoose.Schema({
@@ -10,11 +10,12 @@ const foodSchema = new mongoose.Schema({
     name: { type: String, required: true },
     ingredients: { type: [String], required: true },
     cuisine: { type: String, required: true },
-    meal_type: { type: String, required: true }
+    meal_type: { type: String, required: true },
+    email: { type: String, required: true } // 👈 Added this
 });
 
-
 const Food = mongoose.model("food_combinations", foodSchema);
+
 
 
 const validateRequest = (req, res, next) => {
@@ -92,12 +93,22 @@ router.delete('/users/:id',
 
 router.get("/foods", async (req, res) => {
     try {
-        const allFoods = await Food.find();
-        res.status(200).json(allFoods);
+        const { email } = req.query;
+
+        let foods;
+        if (email) {
+            foods = await Food.find({ email });
+        } else {
+            foods = await Food.find();
+        }
+
+        res.status(200).json(foods);
     } catch (error) {
+        console.error("Error fetching food combinations:", error);
         res.status(500).json({ message: "Error fetching food combinations" });
     }
 });
+
 
 router.post("/foods",
     [
@@ -105,20 +116,33 @@ router.post("/foods",
         body('name').isString().notEmpty().withMessage('Name is required'),
         body('ingredients').isArray().notEmpty().withMessage('Ingredients must be an array and not empty'),
         body('cuisine').isString().notEmpty().withMessage('Cuisine is required'),
-        body('meal_type').isString().notEmpty().withMessage('Meal type is required')
+        body('meal_type').isString().notEmpty().withMessage('Meal type is required'),
+        body('email').isEmail().withMessage('Valid email is required') // <-- Email validation
     ],
     validateRequest,
     async (req, res) => {
         try {
-            const { id, name, ingredients, cuisine, meal_type } = req.body;
+            const { id, name, ingredients, cuisine, meal_type, email } = req.body;
+
+            // Check if user with this email exists
+            const user = await User.findOne({ email });
+            if (!user) {
+                return res.status(400).json({ message: "User with this email doesn't exist" });
+            }
+
+            // Check if food ID is already used
             const existingFood = await Food.findOne({ id });
             if (existingFood) {
                 return res.status(400).json({ message: "Food ID already exists" });
             }
-            const newFood = new Food({ id, name, ingredients, cuisine, meal_type });
+
+            // Create and save new food
+            const newFood = new Food({ id, name, ingredients, cuisine, meal_type, email });
             await newFood.save();
+
             res.status(201).json(newFood);
         } catch (error) {
+            console.error("Error saving food:", error);
             res.status(500).json({ message: "Error adding food combination" });
         }
     }
@@ -179,5 +203,16 @@ router.get("/foods/:id",
         }
     }
 );
+
+// GET all users
+router.get("/user", async (req, res) => {
+    try {
+      const users = await User.find({}, "email"); // Only return emails
+      res.json(users);
+    } catch (err) {
+      res.status(500).json({ message: "Error fetching users" });
+    }
+  });
+  
 
 module.exports = router;
