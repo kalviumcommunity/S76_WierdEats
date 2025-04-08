@@ -1,36 +1,35 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { body, param, validationResult } = require('express-validator'); 
+const { body, param, validationResult } = require('express-validator');
 const router = express.Router();
-const User = require('./schema'); 
+const User = require('./models/user');
+const Food = require('./models/food'); // Your User model
 
+// 🔁 Updated Food schema with reference to User
+// const foodSchema = new mongoose.Schema({
+//     id: { type: Number, required: true, unique: true },
+//     name: { type: String, required: true },
+//     ingredients: { type: [String], required: true },
+//     cuisine: { type: String, required: true },
+//     meal_type: { type: String, required: true },
+//     created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+// });
 
-const foodSchema = new mongoose.Schema({
-    id: { type: Number, required: true, unique: true },
-    name: { type: String, required: true },
-    ingredients: { type: [String], required: true },
-    cuisine: { type: String, required: true },
-    meal_type: { type: String, required: true },
-    email: { type: String, required: true } // 👈 Added this
-});
+// const Food = mongoose.model("food_combinations", foodSchema);
 
-const Food = mongoose.model("food_combinations", foodSchema);
-
-
-
+// Middleware for validation
 const validateRequest = (req, res, next) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
     next();
 };
 
+// ----------------- USER ROUTES -----------------
 router.post('/users',
     [
-        body('name').isString().notEmpty().withMessage('Name is required'),
-        body('email').isEmail().withMessage('Invalid email'),
-        body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')
+        body('name').isString().notEmpty(),
+        body('email').isEmail(),
+        body('password').isLength({ min: 6 })
     ],
     validateRequest,
     async (req, res) => {
@@ -47,110 +46,64 @@ router.post('/users',
 
 router.get('/users', async (req, res) => {
     try {
-        const users = await User.find();
+        const users = await User.find({}, 'name email');
         res.status(200).json(users);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
 
-router.put('/users/:id',
-    [
-        param('id').isMongoId().withMessage('Invalid user ID'),
-        body('name').optional().isString().notEmpty(),
-        body('email').optional().isEmail(),
-        body('password').optional().isLength({ min: 6 })
-    ],
-    validateRequest,
-    async (req, res) => {
-        try {
-            const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
-            if (!updatedUser) return res.status(404).json({ message: "User not found" });
-            res.status(200).json(updatedUser);
-        } catch (error) {
-            res.status(500).json({ message: error.message });
-        }
-    }
-);
+// ----------------- FOOD ROUTES -----------------
 
-router.delete('/users/:id',
-    [
-        param('id').isMongoId().withMessage('Invalid user ID')
-    ],
-    validateRequest,
-    async (req, res) => {
-        try {
-            const deletedUser = await User.findByIdAndDelete(req.params.id);
-            if (!deletedUser) return res.status(404).json({ message: "User not found" });
-            res.status(200).json({ message: "User deleted successfully" });
-        } catch (error) {
-            res.status(500).json({ message: error.message });
-        }
-    }
-);
-
-
-
-router.get("/foods", async (req, res) => {
-    try {
-        const { email } = req.query;
-
-        let foods;
-        if (email) {
-            foods = await Food.find({ email });
-        } else {
-            foods = await Food.find();
-        }
-
-        res.status(200).json(foods);
-    } catch (error) {
-        console.error("Error fetching food combinations:", error);
-        res.status(500).json({ message: "Error fetching food combinations" });
-    }
-});
-
-
+// ✅ Create food (linked to a user by ID)
 router.post("/foods",
     [
-        body('id').isInt({ min: 1 }).withMessage('ID must be a positive integer'),
-        body('name').isString().notEmpty().withMessage('Name is required'),
-        body('ingredients').isArray().notEmpty().withMessage('Ingredients must be an array and not empty'),
-        body('cuisine').isString().notEmpty().withMessage('Cuisine is required'),
-        body('meal_type').isString().notEmpty().withMessage('Meal type is required'),
-        body('email').isEmail().withMessage('Valid email is required') // <-- Email validation
+        body('id').isInt({ min: 1 }),
+        body('name').isString().notEmpty(),
+        body('ingredients').isArray().notEmpty(),
+        body('cuisine').isString().notEmpty(),
+        body('meal_type').isString().notEmpty(),
+        body('created_by').isMongoId().withMessage('Valid user ID required')
     ],
     validateRequest,
     async (req, res) => {
         try {
-            const { id, name, ingredients, cuisine, meal_type, email } = req.body;
+            const { id, name, ingredients, cuisine, meal_type, created_by } = req.body;
 
-            // Check if user with this email exists
-            const user = await User.findOne({ email });
-            if (!user) {
-                return res.status(400).json({ message: "User with this email doesn't exist" });
-            }
+            const user = await User.findById(created_by);
+            if (!user) return res.status(400).json({ message: "User not found" });
 
-            // Check if food ID is already used
             const existingFood = await Food.findOne({ id });
-            if (existingFood) {
-                return res.status(400).json({ message: "Food ID already exists" });
-            }
+            if (existingFood) return res.status(400).json({ message: "Food ID already exists" });
 
-            // Create and save new food
-            const newFood = new Food({ id, name, ingredients, cuisine, meal_type, email });
+            const newFood = new Food({ id, name, ingredients, cuisine, meal_type, created_by });
             await newFood.save();
 
             res.status(201).json(newFood);
         } catch (error) {
-            console.error("Error saving food:", error);
-            res.status(500).json({ message: "Error adding food combination" });
+            res.status(500).json({ message: "Error creating food" });
         }
     }
 );
 
+// ✅ Get foods (optional filter by created_by)
+router.get("/foods", async (req, res) => {
+    try {
+        const { created_by } = req.query;
+
+        const query = created_by ? { created_by } : {};
+        const foods = await Food.find(query).populate('created_by', 'name email');
+
+        res.status(200).json(foods);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching food combinations" });
+    }
+});
+
+// ✅ Update food
 router.put("/foods/:id",
     [
-        param('id').isInt({ min: 1 }).withMessage('Invalid food ID'),
+        param('id').isInt({ min: 1 }),
         body('name').optional().isString().notEmpty(),
         body('ingredients').optional().isArray().notEmpty(),
         body('cuisine').optional().isString().notEmpty(),
@@ -160,59 +113,42 @@ router.put("/foods/:id",
     async (req, res) => {
         try {
             const updatedFood = await Food.findOneAndUpdate({ id: req.params.id }, req.body, { new: true });
-            if (!updatedFood) {
-                return res.status(404).json({ message: "Food item not found" });
-            }
+            if (!updatedFood) return res.status(404).json({ message: "Food not found" });
             res.status(200).json(updatedFood);
         } catch (error) {
-            res.status(500).json({ message: "Error updating food combination" });
+            res.status(500).json({ message: "Error updating food" });
         }
     }
 );
 
+// ✅ Delete food
 router.delete("/foods/:id",
-    [
-        param('id').isInt({ min: 1 }).withMessage('Invalid food ID')
-    ],
+    [param('id').isInt({ min: 1 })],
     validateRequest,
     async (req, res) => {
         try {
             const deletedFood = await Food.findOneAndDelete({ id: req.params.id });
-            if (!deletedFood) {
-                return res.status(404).json({ message: "Food item not found" });
-            }
-            res.status(200).json({ message: "Food item deleted successfully" });
+            if (!deletedFood) return res.status(404).json({ message: "Food not found" });
+            res.status(200).json({ message: "Food deleted successfully" });
         } catch (error) {
-            res.status(500).json({ message: "Error deleting food combination" });
+            res.status(500).json({ message: "Error deleting food" });
         }
     }
 );
 
+// ✅ Get food by Mongo ID
 router.get("/foods/:id",
-    [
-        param('id').isMongoId().withMessage('Invalid food ID')
-    ],
+    [param('id').isMongoId()],
     validateRequest,
     async (req, res) => {
         try {
-            const food = await Food.findById(req.params.id);
+            const food = await Food.findById(req.params.id).populate('created_by', 'name email');
             if (!food) return res.status(404).json({ message: "Food not found" });
             res.status(200).json(food);
         } catch (error) {
-            res.status(500).json({ message: "Error fetching food item" });
+            res.status(500).json({ message: "Error fetching food" });
         }
     }
 );
-
-// GET all users
-router.get("/user", async (req, res) => {
-    try {
-      const users = await User.find({}, "email"); // Only return emails
-      res.json(users);
-    } catch (err) {
-      res.status(500).json({ message: "Error fetching users" });
-    }
-  });
-  
 
 module.exports = router;
