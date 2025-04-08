@@ -2,15 +2,16 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function FoodForm() {
-    const { id } = useParams(); // Get ID from URL if updating
+    const { id } = useParams();
     const navigate = useNavigate();
-    
+
     const [food, setFood] = useState({
         id: "",
         name: "",
         ingredients: "",
         cuisine: "",
-        meal_type: ""
+        meal_type: "",
+        email: "" // <-- Added email field
     });
 
     useEffect(() => {
@@ -21,9 +22,10 @@ export default function FoodForm() {
                     setFood({
                         id: data.id,
                         name: data.name,
-                        ingredients: data.ingredients.join(", "), // Convert array to string
+                        ingredients: data.ingredients.join(", "),
                         cuisine: data.cuisine,
-                        meal_type: data.meal_type
+                        meal_type: data.meal_type,
+                        email: data.email || "" // <-- Load email if exists
                     });
                 })
                 .catch(error => console.error("Error fetching food item:", error));
@@ -37,7 +39,7 @@ export default function FoodForm() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!food.name || !food.ingredients || !food.cuisine || !food.meal_type) {
+        if (!food.name || !food.ingredients || !food.cuisine || !food.meal_type || !food.email) {
             alert("All fields are required!");
             return;
         }
@@ -45,15 +47,16 @@ export default function FoodForm() {
         const foodData = {
             id: parseInt(food.id, 10),
             name: food.name,
-            ingredients: food.ingredients.split(",").map(item => item.trim()), // Convert back to array
+            ingredients: food.ingredients.split(",").map(item => item.trim()),
             cuisine: food.cuisine,
-            meal_type: food.meal_type
+            meal_type: food.meal_type,
+            email: food.email
         };
 
         try {
-            const method = id ? "PUT" : "POST"; // Use PUT for update, POST for new item
-            const url = id 
-                ? `http://localhost:5000/api/foods/${id}` 
+            const method = id ? "PUT" : "POST";
+            const url = id
+                ? `http://localhost:5000/api/foods/${id}`
                 : "http://localhost:5000/api/foods";
 
             const response = await fetch(url, {
@@ -64,7 +67,7 @@ export default function FoodForm() {
 
             if (response.ok) {
                 alert(`Food item ${id ? "updated" : "added"} successfully!`);
-                navigate("/"); // Redirect to food list
+                navigate("/");
             } else {
                 alert("Failed to save food item");
             }
@@ -121,6 +124,15 @@ export default function FoodForm() {
                     name="meal_type"
                     placeholder="Meal Type"
                     value={food.meal_type}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded"
+                    required
+                />
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Your Email"
+                    value={food.email}
                     onChange={handleChange}
                     className="w-full p-2 border rounded"
                     required
