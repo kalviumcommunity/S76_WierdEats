@@ -6,7 +6,6 @@ export default function FoodForm() {
   const navigate = useNavigate();
 
   const [food, setFood] = useState({
-    id: "",
     name: "",
     ingredients: "",
     cuisine: "",
@@ -15,11 +14,10 @@ export default function FoodForm() {
 
   useEffect(() => {
     if (id) {
-      fetch(`http://localhost:5000/api/foods/${id}`)
+      fetch(`http://localhost:3000/api/foods/${id}`)
         .then((response) => response.json())
         .then((data) => {
           setFood({
-            id: data.id,
             name: data.name,
             ingredients: data.ingredients.join(", "),
             cuisine: data.cuisine,
@@ -42,10 +40,13 @@ export default function FoodForm() {
       return;
     }
 
-    const userId = localStorage.getItem("userId");
+    const userId = parseInt(localStorage.getItem("userId"), 10);
+    if (!id && (!userId || isNaN(userId))) {
+      alert("No valid user selected. Please select a user before adding a food item.");
+      return;
+    }
 
     const foodData = {
-      id: parseInt(food.id, 10),
       name: food.name,
       ingredients: food.ingredients.split(",").map((item) => item.trim()),
       cuisine: food.cuisine,
@@ -53,11 +54,14 @@ export default function FoodForm() {
       ...(id ? {} : { created_by: userId }),
     };
 
+    const method = id ? "PUT" : "POST";
+    const url = id
+      ? `http://localhost:3000/api/foods/${id}`
+      : "http://localhost:3000/api/foods";
+
     try {
-      const method = id ? "PUT" : "POST";
-      const url = id
-        ? `http://localhost:5000/api/foods/${id}`
-        : "http://localhost:5000/api/foods";
+      console.log("Sending food data:", foodData);
+      console.log("Request method:", method, "URL:", url);
 
       const response = await fetch(url, {
         method,
@@ -67,7 +71,7 @@ export default function FoodForm() {
 
       if (response.ok) {
         alert(`Food item ${id ? "updated" : "added"} successfully!`);
-        localStorage.removeItem("userId");
+        if (!id) localStorage.removeItem("userId");
         navigate("/");
       } else {
         alert("Failed to save food item");
@@ -80,19 +84,10 @@ export default function FoodForm() {
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-4 text-center">{id ? "Edit" : "Add"} Food Item</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center">
+        {id ? "Edit" : "Add"} Food Item
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {!id && (
-          <input
-            type="number"
-            name="id"
-            placeholder="Food ID (Enter manually)"
-            value={food.id}
-            onChange={handleChange}
-            className="w-full p-2 border rounded"
-            required
-          />
-        )}
         <input
           type="text"
           name="name"

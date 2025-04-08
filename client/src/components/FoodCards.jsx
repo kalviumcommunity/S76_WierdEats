@@ -18,7 +18,7 @@ const FoodCards = () => {
 
   const fetchFoods = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/foods");
+      const response = await axios.get("http://localhost:3000/api/foods");
       setFoods(response.data);
       setAllFoods(response.data);
     } catch (err) {
@@ -30,7 +30,7 @@ const FoodCards = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/users");
+      const response = await axios.get("http://localhost:3000/api/users");
       setUsers(response.data);
     } catch (err) {
       console.error("Error fetching users", err);
@@ -40,7 +40,7 @@ const FoodCards = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this food item?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/foods/${id}`);
+      await axios.delete(`http://localhost:3000/api/foods/${id}`);
       const updatedFoods = foods.filter((food) => food.id !== id);
       setFoods(updatedFoods);
       setAllFoods(updatedFoods);
@@ -87,7 +87,7 @@ const FoodCards = () => {
             onClick={() => {
               const selectedUser = users.find((user) => user.email === selectedEmail);
               if (selectedUser) {
-                localStorage.setItem("userId", selectedUser._id);
+                localStorage.setItem("userId", selectedUser.id);
                 navigate("/add-food");
               }
             }}

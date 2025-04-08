@@ -4,14 +4,18 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 const dotenv =require("dotenv");
-const connectDatabase = require('./database');
+const connectDatabase = require('./database/database');
+const mysql = require('mysql2');
+const mysqlConnection  = require('./database/sqlDatabase');
+const bodyParser = require('body-parser');
 const cors = require("cors");
 dotenv.config();
 app.use(express.json());
 app.use(cors());
 
-const Routes = require("./routes")
+const Routes = require("./routes/sqlroutes");
 connectDatabase();
+
 
 app.use('/api',Routes);
 
