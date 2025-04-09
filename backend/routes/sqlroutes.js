@@ -1,6 +1,8 @@
 const express = require('express');
 const { body, param, validationResult } = require('express-validator');
 const pool = require('../database/sqlDatabase');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
 const router = express.Router();
 
 const validateRequest = (req, res, next) => {
@@ -9,7 +11,7 @@ const validateRequest = (req, res, next) => {
     next();
 };
 
-// ----------------- USERS -----------------
+
 
 router.post('/users',
     [
@@ -32,6 +34,37 @@ router.post('/users',
     }
 );
 
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+      const [rows] = await pool.query(
+          'SELECT * FROM users WHERE email = ?',
+          [email]
+      );
+
+      if (rows.length === 0) {
+          return res.status(400).json({ message: 'User not found' });
+      }
+
+      const user = rows[0];
+
+      if (user.password !== password) {
+          return res.status(401).json({ message: 'Invalid password' });
+      }
+
+      res.cookie('username', user.name, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+        sameSite: 'Lax',
+        secure: false 
+      });
+
+      res.json({ id: user.id, name: user.name, email: user.email });
+  } catch (err) {
+      res.status(500).json({ message: err.message });
+  }
+});
+
 router.get('/users', async (req, res) => {
     try {
         const [rows] = await pool.query('SELECT id, name, email FROM users');
@@ -41,7 +74,15 @@ router.get('/users', async (req, res) => {
     }
 });
 
-// ----------------- FOODS -----------------
+router.post('/logout', (req, res) => {
+  res.clearCookie('username', {
+    httpOnly: true,
+    sameSite: 'Lax',
+    secure: false 
+  });
+  res.json({ message: 'Logged out successfully' });
+});
+
 
 router.post("/foods",
     [

@@ -5,6 +5,7 @@ import NavBar from './components/NavBar'
 import Component from './components/Component'
 import FoodCards from './components/FoodCards'
 import FoodForm from './components/FoodForm'
+import Login from './pages/Login'
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Route path = '/foods' element={<FoodCards/>}/>
         <Route path = '/add-food' element={<FoodForm/>}/>
         <Route path = '/edit-food/:id' element={<FoodForm/>}/>
+        <Route path = '/login' element={<Login/>}/>
 
       </Routes>
     </BrowserRouter>
