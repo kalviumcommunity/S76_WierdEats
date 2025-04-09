@@ -4,6 +4,10 @@ const pool = require('../database/sqlDatabase');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = 'vignesh123';
+// const authenticate = require('./middleware/jwt');
+
 
 const validateRequest = (req, res, next) => {
     const errors = validationResult(req);
@@ -14,56 +18,66 @@ const validateRequest = (req, res, next) => {
 
 
 router.post('/users',
-    [
-        body('name').isString().notEmpty(),
-        body('email').isEmail(),
-        body('password').isLength({ min: 6 })
-    ],
-    validateRequest,
-    async (req, res) => {
-        const { name, email, password } = req.body;
-        try {
-            const [result] = await pool.query(
-                'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-                [name, email, password]
-            );
-            res.status(201).json({ id: result.insertId, name, email });
-        } catch (err) {
-            res.status(500).json({ message: err.message });
-        }
-    }
+  [
+      body('name').isString().notEmpty(),
+      body('email').isEmail(),
+      body('password').isLength({ min: 6 })
+  ],
+  validateRequest,
+  async (req, res) => {
+      const { name, email, password } = req.body;
+      try {
+          const [result] = await pool.query(
+              'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+              [name, email, password]
+          );
+
+          const user = { id: result.insertId, name, email };
+
+          
+          const token = jwt.sign(user, JWT_SECRET, { expiresIn: '1h' });
+
+          
+          res.cookie('token', token, {
+              httpOnly: true,
+              secure: false,
+              sameSite: 'Lax',
+              maxAge: 60 * 60 * 1000 
+          });
+
+          res.status(201).json({ message: 'User created and logged in', user });
+      } catch (err) {
+          res.status(500).json({ message: err.message });
+      }
+  }
 );
+
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
-      const [rows] = await pool.query(
-          'SELECT * FROM users WHERE email = ?',
-          [email]
-      );
+    const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+    if (rows.length === 0) return res.status(400).json({ message: 'User not found' });
 
-      if (rows.length === 0) {
-          return res.status(400).json({ message: 'User not found' });
-      }
+    const user = rows[0];
+    if (user.password !== password) return res.status(401).json({ message: 'Invalid password' });
 
-      const user = rows[0];
+   
+    const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '1h' });
 
-      if (user.password !== password) {
-          return res.status(401).json({ message: 'Invalid password' });
-      }
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: false, 
+      sameSite: 'Lax',
+      maxAge: 60 * 60 * 1000 
+    });
 
-      res.cookie('username', user.name, {
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
-        sameSite: 'Lax',
-        secure: false 
-      });
-
-      res.json({ id: user.id, name: user.name, email: user.email });
+    res.json({ message: 'Login successful' });
   } catch (err) {
-      res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
+
 
 router.get('/users', async (req, res) => {
     try {
@@ -75,13 +89,14 @@ router.get('/users', async (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
-  res.clearCookie('username', {
+  res.clearCookie('token', {
     httpOnly: true,
     sameSite: 'Lax',
-    secure: false 
+    secure: false
   });
   res.json({ message: 'Logged out successfully' });
 });
+
 
 
 router.post("/foods",
