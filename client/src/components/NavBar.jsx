@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const NavBar = ({ isVisible }) => {
   return (
@@ -13,14 +14,24 @@ const NavBar = ({ isVisible }) => {
           <div className="w-6 h-6 rounded-full bg-white absolute mr-[80px] animate-float"></div>
         </div>
         <div className="flex flex-row justify-center items-center gap-3">
-          {["Home", "Foods", "My Account", "Login"].map((item) => (
-            <div
-              key={item}
-              className="w-[90px] h-7 rounded-md flex justify-center items-center text-center text-[15px] font-semibold hover:scale-110 transition duration-300 hover:bg-white hover:text-[#6948DF]"
-            >
-              {item}
-            </div>
-          ))}
+          {["Home", "Foods", "My Account", "Login"].map((item) =>
+            item === "Login" ? (
+              <Link
+                to="/login"
+                key={item}
+                className="w-[90px] h-7 rounded-md flex justify-center items-center text-center text-[15px] font-semibold hover:scale-110 transition duration-300 hover:bg-white hover:text-[#6948DF]"
+              >
+                {item}
+              </Link>
+            ) : (
+              <div
+                key={item}
+                className="w-[90px] h-7 rounded-md flex justify-center items-center text-center text-[15px] font-semibold hover:scale-110 transition duration-300 hover:bg-white hover:text-[#6948DF]"
+              >
+                {item}
+              </div>
+            )
+          )}
         </div>
       </div>
     </div>

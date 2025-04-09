@@ -10,6 +10,8 @@ const mysqlConnection  = require('./database/sqlDatabase');
 const bodyParser = require('body-parser');
 const cors = require("cors");
 dotenv.config();
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
 app.use(express.json());
 app.use(cors());
 
